@@ -1,0 +1,11 @@
+[package]
+name = "d-shell-bin"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+d-shell = {path="d-shell"}
+
+[workspace]
+resolver = "3"
+members = ["d-shell"]
