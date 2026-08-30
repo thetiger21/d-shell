@@ -2,8 +2,8 @@ use crossterm::{
     cursor,
     event::{
         self, Event,
-        KeyCode::{self, Modifier},
-        KeyEvent, KeyModifiers,
+        KeyCode::{self},
+        KeyEvent, KeyEventKind, KeyModifiers,
     },
     execute,
     terminal::{Clear, ClearType, disable_raw_mode, enable_raw_mode},
@@ -33,9 +33,17 @@ pub fn get_input(state: &mut ShellState, mut wasm_runtime: WasmRuntime) -> io::R
     stdout.flush()?;
     loop {
         if let Event::Key(KeyEvent {
-            code, modifiers, ..
+            code,
+            modifiers,
+            kind,
+            ..
         }) = event::read()?
         {
+            // On Windows, crossterm fires both a Press and Release event for
+            // every keystroke. Skip non-Press events to prevent double characters.
+            if kind != KeyEventKind::Press {
+                continue;
+            }
             match (code, modifiers) {
                 (KeyCode::Char('d'), KeyModifiers::CONTROL) => {
                     let mut exit_command = Exit::new();

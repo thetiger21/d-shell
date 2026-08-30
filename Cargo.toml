@@ -8,4 +8,4 @@ d-shell = {path="d-shell"}
 
 [workspace]
 resolver = "3"
-members = ["d-shell"]
+members = ["d-shell", "d-shell-edit"]

@@ -4,9 +4,7 @@ use std::{
 };
 
 use comfy_table::{
-    Cell, Color, Table,
-    modifiers::UTF8_ROUND_CORNERS,
-    presets::{UTF8_FULL, UTF8_FULL_CONDENSED},
+    Cell, Color, Table, modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL_CONDENSED,
 };
 
 use crate::{command_processor::commands::ShellCommand, state::ShellState, token_types::Argument};

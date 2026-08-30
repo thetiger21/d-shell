@@ -9,12 +9,10 @@ impl ShellCommand for Mkdir {
         Self
     }
 
-    fn run(&mut self, state: &mut ShellState, input: String, arguments: Vec<Argument>) -> String {
+    fn run(&mut self, state: &mut ShellState, input: String, _: Vec<Argument>) -> String {
         match fs::create_dir(format!("{}/{}", state.current_directory, input)) {
             Ok(_) => (),
-            Err(err_msg) => {
-                return "[ERROR] Unable to create folder due to: {}".to_string();
-            }
+            Err(err_msg) => return format!("[ERROR] Unable to create folder due to: {}", err_msg),
         }
         String::from("Created folder successfully")
     }

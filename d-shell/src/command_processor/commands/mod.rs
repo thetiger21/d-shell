@@ -4,6 +4,7 @@ pub mod cat;
 pub mod cd;
 pub mod clear;
 pub mod echo;
+pub mod edit;
 pub mod exit;
 pub mod help;
 pub mod ls;

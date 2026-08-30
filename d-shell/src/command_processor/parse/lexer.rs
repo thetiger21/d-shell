@@ -93,3 +93,61 @@ pub fn lexer(input: &String) -> Vec<LexerTokens> {
     }
     output
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_lexer_comma_emitted_as_separate_token() {
+        let input = String::from("write stuff -f hello, heyo");
+        let result = lexer(&input);
+        assert_eq!(
+            result,
+            vec![
+                LexerTokens::Identifier("write".to_string()),
+                LexerTokens::Identifier("stuff".to_string()),
+                LexerTokens::Dash,
+                LexerTokens::Identifier("f".to_string()),
+                // Comma is emitted before the preceding identifier
+                LexerTokens::Comma,
+                LexerTokens::Identifier("hello".to_string()),
+                LexerTokens::Identifier("heyo".to_string()),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_lexer_write_quoted_input_with_flag_multiple_files() {
+        let input = String::from("write \"I like bannana\" -f hello heyo");
+        let result = lexer(&input);
+        assert_eq!(
+            result,
+            vec![
+                LexerTokens::Identifier("write".to_string()),
+                LexerTokens::Identifier("I like bannana".to_string()),
+                LexerTokens::Dash,
+                LexerTokens::Identifier("f".to_string()),
+                LexerTokens::Identifier("hello".to_string()),
+                LexerTokens::Identifier("heyo".to_string()),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_lexer_write_no_quotes_multiple_files() {
+        let input = String::from("write hello -f file1 file2");
+        let result = lexer(&input);
+        assert_eq!(
+            result,
+            vec![
+                LexerTokens::Identifier("write".to_string()),
+                LexerTokens::Identifier("hello".to_string()),
+                LexerTokens::Dash,
+                LexerTokens::Identifier("f".to_string()),
+                LexerTokens::Identifier("file1".to_string()),
+                LexerTokens::Identifier("file2".to_string()),
+            ]
+        );
+    }
+}

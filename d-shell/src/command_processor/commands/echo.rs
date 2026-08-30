@@ -1,4 +1,4 @@
-use crate::{command_processor::commands::ShellCommand, state::ShellState, token_types::Argument};
+use crate::{command_processor::commands::ShellCommand, token_types::Argument};
 
 pub struct Echo;
 

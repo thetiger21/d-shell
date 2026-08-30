@@ -1,4 +1,4 @@
-use crate::{command_processor::commands::ShellCommand, state::ShellState, token_types::Argument};
+use crate::{command_processor::commands::ShellCommand, token_types::Argument};
 
 pub struct Clear;
 
@@ -10,12 +10,7 @@ impl ShellCommand for Clear {
         Self
     }
 
-    fn run(
-        &mut self,
-        state: &mut crate::state::ShellState,
-        input: String,
-        arguments: Vec<Argument>,
-    ) -> String {
+    fn run(&mut self, _: &mut crate::state::ShellState, _: String, _: Vec<Argument>) -> String {
         match clearscreen::clear() {
             Ok(_) => "Successfully cleared screen".to_string(),
             Err(err_msg) => format!("Unable to clear screen due to: {}", err_msg),

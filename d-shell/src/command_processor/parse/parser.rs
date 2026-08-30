@@ -1,12 +1,11 @@
-use std::process::exit;
-
 use inline_colorization::*;
 
 use crate::{
     command_processor::{
         commands::{
-            ShellCommand, cat::Cat, cd::CD, clear::Clear, echo::Echo, exit::Exit, help::Help,
-            ls::LS, mkdir::Mkdir, rm::Remove, run::Run, touch::Touch, write::WriteCommand,
+            ShellCommand, cat::Cat, cd::CD, clear::Clear, echo::Echo, edit::Edit, exit::Exit,
+            help::Help, ls::LS, mkdir::Mkdir, rm::Remove, run::Run, touch::Touch,
+            write::WriteCommand,
         },
         parse::lexer::LexerTokens::{self},
     },
@@ -98,6 +97,7 @@ pub fn proccess_identifier(input: &String) -> Result<Token, String> {
         "write" => Ok(Token::Command(Box::new(WriteCommand::new()))),
         "rm" => Ok(Token::Command(Box::new(Remove::new()))),
         "run" => Ok(Token::Command(Box::new(Run::new()))),
+        "edit" => Ok(Token::Command(Box::new(Edit::new()))),
         _ => Err(format!(
             "{color_bright_red}{style_bold}Command: '{}' does not exist",
             input
@@ -354,7 +354,9 @@ mod tests {
 
     #[test]
     fn test_parser_ls_file_with_comma_values() {
-        // The lexer folds commas into identifiers: "hello," becomes Id("hello,")
+        // The lexer emits commas as separate LexerTokens::Comma tokens.
+        // The parser's proccess_argument treats Comma as a no-op separator,
+        // so commas do NOT appear in the filenames.
         let input = String::from("ls -file hello, hw, wh, hw");
         let lexed = crate::command_processor::parse::lexer::lexer(&input);
         let result = parser(lexed).unwrap();
@@ -369,14 +371,53 @@ mod tests {
                 assert_eq!(
                     arg.content,
                     ArgumentType::Multiple(vec![
-                        "hello,".to_string(),
-                        "hw,".to_string(),
-                        "wh,".to_string(),
+                        "hello".to_string(),
+                        "hw".to_string(),
+                        "wh".to_string(),
                         "hw".to_string()
                     ])
                 );
             }
             _ => panic!("Expected Token::Argument for -file"),
+        }
+    }
+
+    #[test]
+    fn test_parser_write_stuff_with_comma_in_filenames() {
+        // End-to-end lexer + parser test for: write stuff -f hello, heyo
+        // Commas are separate LexerTokens::Comma tokens, so "hello" does NOT
+        // include the comma in its identifier.
+        let input = String::from("write stuff -f hello, heyo");
+        let lexed = crate::command_processor::parse::lexer::lexer(&input);
+        let result = parser(lexed).unwrap();
+
+        assert_eq!(
+            result.len(),
+            3,
+            "Expected 3 tokens: command + input + argument"
+        );
+
+        match &result[0] {
+            Token::Command(_) => {}
+            _ => panic!("Expected Token::Command as first token (write)"),
+        }
+
+        match &result[1] {
+            Token::Input(input) => assert_eq!(input, "stuff"),
+            _ => panic!("Expected Token::Input as second token"),
+        }
+
+        match &result[2] {
+            Token::Argument(arg) => {
+                assert_eq!(arg.id, "f", "Flag id should be 'f'");
+                // Comma is NOT part of "hello" — it's a separate token handled
+                // by the parser as a separator between flag values.
+                assert_eq!(
+                    arg.content,
+                    ArgumentType::Multiple(vec!["hello".to_string(), "heyo".to_string()]),
+                );
+            }
+            _ => panic!("Expected Token::Argument as third token"),
         }
     }
 
