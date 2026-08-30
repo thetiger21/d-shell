@@ -1,4 +1,5 @@
 use inline_colorization::*;
+//The parser contains heavy ai involvement, however this is the only file outside of tests to involve ai written code.
 
 use crate::{
     command_processor::{
@@ -141,10 +142,7 @@ pub fn proccess_argument(input: Vec<LexerTokens>) -> Result<Vec<Token>, String> 
                     output.push(Token::Input(string));
                 }
             }
-            LexerTokens::Comma => {
-                // Comma is a separator; the next identifier still belongs
-                // to the current flag's content
-            }
+            LexerTokens::Comma => {}
             LexerTokens::ArrowRight => {
                 return Err(format!(
                     "{color_bright_red}{style_bold}Goodness sake can't you just use the cli properly?.. you know you cannot just have '>' when you are typing arguments... if you really want to then put flipping quotation marks around it!{style_reset}"
@@ -153,7 +151,6 @@ pub fn proccess_argument(input: Vec<LexerTokens>) -> Result<Vec<Token>, String> 
         }
     }
 
-    // Flush the final argument if one is pending
     if let Some(id) = current_id {
         let content = if current_content.is_empty() {
             ArgumentType::Nothing
