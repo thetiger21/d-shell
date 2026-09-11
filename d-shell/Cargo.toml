@@ -15,6 +15,7 @@ wasmtime-wasi = "46.0.1"
 mlua = { version = "0.12.0", features = ["luau", "vendored"] }
 ggez = "0.10.0"
 d-shell-edit = {path="../d-shell-edit"}
+reqwest = { version = "0.13.4", features = ["blocking"] }
 
 [dev-dependencies]
 tempfile = "3.19.1"

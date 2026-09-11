@@ -50,10 +50,12 @@ pub fn run_editor(file_path: &str) -> anyhow::Result<()> {
         if let Event::Key(key) = event::read()? {
             if key.kind == KeyEventKind::Press {
                 match (key.modifiers, key.code) {
-                    (_, KeyCode::Esc) => break,
                     (KeyModifiers::CONTROL, KeyCode::Char('s')) => {
                         println!("Pressed control s");
                         fs::write(file_path, editor.get_content());
+                        break;
+                    }
+                    (KeyModifiers::CONTROL, KeyCode::Char('q')) => {
                         break;
                     }
                     _ => (),

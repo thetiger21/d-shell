@@ -137,7 +137,6 @@ impl LS {
                     eprintln!(
                         "This file or operating system is corrupted in some way... Unable to list files"
                     );
-                    exit(101);
                 }
             }
         }

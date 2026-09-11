@@ -5,7 +5,7 @@ use crate::{
     command_processor::{
         commands::{
             ShellCommand, cat::Cat, cd::CD, clear::Clear, echo::Echo, edit::Edit, exit::Exit,
-            help::Help, ls::LS, mkdir::Mkdir, rm::Remove, run::Run, touch::Touch,
+            help::Help, ls::LS, marella::Marella, mkdir::Mkdir, rm::Remove, run::Run, touch::Touch,
             write::WriteCommand,
         },
         parse::lexer::LexerTokens::{self},
@@ -99,6 +99,7 @@ pub fn proccess_identifier(input: &String) -> Result<Token, String> {
         "rm" => Ok(Token::Command(Box::new(Remove::new()))),
         "run" => Ok(Token::Command(Box::new(Run::new()))),
         "edit" => Ok(Token::Command(Box::new(Edit::new()))),
+        "marella" => Ok(Token::Command(Box::new(Marella::new()))),
         _ => Err(format!(
             "{color_bright_red}{style_bold}Command: '{}' does not exist",
             input

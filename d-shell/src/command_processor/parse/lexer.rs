@@ -109,7 +109,6 @@ mod tests {
                 LexerTokens::Identifier("stuff".to_string()),
                 LexerTokens::Dash,
                 LexerTokens::Identifier("f".to_string()),
-                // Comma is emitted before the preceding identifier
                 LexerTokens::Comma,
                 LexerTokens::Identifier("hello".to_string()),
                 LexerTokens::Identifier("heyo".to_string()),

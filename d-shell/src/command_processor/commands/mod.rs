@@ -8,6 +8,7 @@ pub mod edit;
 pub mod exit;
 pub mod help;
 pub mod ls;
+pub mod marella;
 pub mod mkdir;
 pub mod rm;
 pub mod run;

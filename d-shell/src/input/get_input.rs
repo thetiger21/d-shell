@@ -9,7 +9,10 @@ use crossterm::{
     terminal::{Clear, ClearType, disable_raw_mode, enable_raw_mode},
 };
 use inline_colorization::*;
-use std::io::{self, Stdout, Write};
+use std::{
+    fs,
+    io::{self, Stdout, Write},
+};
 
 use crate::{
     command_processor::{
@@ -25,9 +28,11 @@ pub fn get_input(state: &mut ShellState, mut wasm_runtime: WasmRuntime) -> io::R
     let mut stdout = io::stdout();
     let mut command = String::new();
     execute!(stdout, Clear(ClearType::All), cursor::MoveTo(0, 0))?;
+    execute!(stdout, cursor::SetCursorStyle::BlinkingBar)?;
 
     let mut command_invalid = false;
 
+    print!("Please read usage policy before use by typing 'help -usage_policy'\n");
     state.display(&command, command_invalid, &stdout);
 
     stdout.flush()?;
@@ -39,8 +44,6 @@ pub fn get_input(state: &mut ShellState, mut wasm_runtime: WasmRuntime) -> io::R
             ..
         }) = event::read()?
         {
-            // On Windows, crossterm fires both a Press and Release event for
-            // every keystroke. Skip non-Press events to prevent double characters.
             if kind != KeyEventKind::Press {
                 continue;
             }
@@ -57,6 +60,7 @@ pub fn get_input(state: &mut ShellState, mut wasm_runtime: WasmRuntime) -> io::R
                     while !command.is_empty() && state.write_index > 0 {
                         let value = command.pop();
                         if value == Some(' ') {
+                            state.write_index -= 1;
                             break;
                         }
                         state.write_index -= 1;
@@ -77,13 +81,19 @@ pub fn get_input(state: &mut ShellState, mut wasm_runtime: WasmRuntime) -> io::R
                         }
                     };
                     if command.chars().nth(0) == Some('.') {
-                        command_invalid = false;
+                        let mut prorgam_name = command.clone();
+                        prorgam_name.remove(0);
+                        match fs::exists(format!(".programs/{}/bin", prorgam_name)) {
+                            Ok(true) => command_invalid = false,
+                            Ok(false) => command_invalid = true,
+                            Err(_) => command_invalid = true,
+                        }
                     }
                 }
 
                 (KeyCode::Backspace, _) => {
-                    if command.len() > 0 {
-                        command.pop();
+                    if command.len() > 0 && state.write_index > 0 {
+                        command.remove(state.write_index - 1);
                         state.write_index -= 1;
                         match parse(&command) {
                             Ok(_) => {
