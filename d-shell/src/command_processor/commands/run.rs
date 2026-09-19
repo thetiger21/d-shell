@@ -1,6 +1,6 @@
 use std::fs;
 
-use crate::{command_processor::commands::ShellCommand, luau::run_lua};
+use crate::command_processor::commands::ShellCommand;
 
 pub struct Run;
 
@@ -18,12 +18,7 @@ impl ShellCommand for Run {
         input: String,
         _: Vec<crate::token_types::Argument>,
     ) -> String {
-        if input.ends_with(".luau") {
-            match run_lua(&input) {
-                Ok(string) => return string,
-                Err(err_msg) => return format!("{}", err_msg),
-            }
-        } else {
+        if input.ends_with(".script") {
             let string_contents = match fs::read_to_string(&input) {
                 Ok(data) => data,
                 Err(error_msg) => {
@@ -31,6 +26,7 @@ impl ShellCommand for Run {
                 }
             };
             state.parse_script(&string_contents);
+        } else {
         }
         "Script ran successfully".to_string()
     }

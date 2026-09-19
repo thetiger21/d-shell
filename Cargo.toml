@@ -8,7 +8,7 @@ d-shell = {path="d-shell"}
 
 [workspace]
 resolver = "3"
-members = ["d-shell", "d-shell-edit"]
+members = ["d-shell", "d-shell-edit", "d-shell-wasm"]
 
 [profile.dev]
 opt-level = 0

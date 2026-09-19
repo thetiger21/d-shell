@@ -1,10 +1,12 @@
-use std::{collections::HashMap, env};
+use std::{
+    collections::{HashMap, VecDeque},
+    env,
+};
 
 #[derive(Clone)]
 pub struct ShellState {
     pub current_directory: String,
     programs_directory: String,
-    history: Vec<String>,
     pub write_index: usize,
     pub output: String,
     pub variables: HashMap<String, String>,
@@ -27,17 +29,8 @@ impl ShellState {
             current_directory,
             programs_directory,
             write_index: 0,
-            history: Vec::new(),
             output: String::new(),
             variables: HashMap::new(),
-        }
-    }
-
-    pub fn get_history(&mut self, index: usize) -> Option<String> {
-        if self.history.len() <= index - 1 {
-            return Some(self.history[index].clone());
-        } else {
-            return None;
         }
     }
 

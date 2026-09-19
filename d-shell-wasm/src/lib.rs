@@ -1,10 +1,13 @@
 pub mod parse;
 pub mod run;
+pub mod terminal_api;
 
 use wasmtime::component::{Component, Linker, ResourceTable};
 use wasmtime::*;
 use wasmtime_wasi::p2::bindings::sync::Command;
 use wasmtime_wasi::{DirPerms, FilePerms, WasiCtx, WasiCtxView, WasiView};
+
+use crate::terminal_api::local;
 
 pub struct ComponentRunStates {
     pub wasi_ctx: WasiCtx,
@@ -36,6 +39,10 @@ impl WasmRuntime {
         let mut linker = Linker::new(&engine);
 
         wasmtime_wasi::p2::add_to_linker_sync(&mut linker)?;
+        local::runtime::host_control::add_to_linker::<ComponentRunStates, ComponentRunStates>(
+            &mut linker,
+            |state| state,
+        )?;
 
         Ok(Self { engine, linker })
     }
@@ -75,6 +82,7 @@ impl WasmRuntime {
         if program_result.is_err() {
             return Ok(ProgamState::Failed);
         }
+
         Ok(ProgamState::Success)
     }
 }

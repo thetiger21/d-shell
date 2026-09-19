@@ -8,6 +8,10 @@ use crossterm::{
     execute,
     terminal::{Clear, ClearType, disable_raw_mode, enable_raw_mode},
 };
+use d_shell_wasm::{
+    WasmRuntime,
+    run::{WasmProgramRunningConfiguration, run_program},
+};
 use inline_colorization::*;
 use std::{
     fs,
@@ -20,7 +24,6 @@ use crate::{
         parse::parse,
     },
     state::ShellState,
-    wasm::WasmRuntime,
 };
 
 pub fn get_input(state: &mut ShellState, mut wasm_runtime: WasmRuntime) -> io::Result<String> {
@@ -122,11 +125,19 @@ pub fn get_input(state: &mut ShellState, mut wasm_runtime: WasmRuntime) -> io::R
                         stdout.flush()?;
                     }
                 }
+                (KeyCode::Up, _) => {}
                 (KeyCode::Enter, _) => {
                     disable_raw_mode()?;
                     print!("\n");
                     if command.chars().nth(0) == Some('.') {
-                        state.run_program(&command, &mut wasm_runtime);
+                        run_program(
+                            WasmProgramRunningConfiguration {
+                                program_directory: state.clone().get_programs_directory(),
+                                current_directory: state.current_directory.clone(),
+                                input: command.clone(),
+                            },
+                            &mut wasm_runtime,
+                        );
                     } else {
                         match parse(&command) {
                             Ok(tokens) => {

@@ -1,14 +1,14 @@
 pub mod command_processor;
 pub mod input;
-pub mod luau;
 pub mod script_parsing;
 pub mod state;
 pub mod token_types;
-pub mod wasm;
 
 use std::io::{self};
 
-use crate::{input::get_input::get_input, state::ShellState, wasm::WasmRuntime};
+use d_shell_wasm::WasmRuntime;
+
+use crate::{input::get_input::get_input, state::ShellState};
 
 pub fn run_shell() -> io::Result<String> {
     let mut shell_state = ShellState::new();

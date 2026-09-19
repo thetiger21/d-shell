@@ -58,11 +58,11 @@ pub fn run_editor(file_path: &str) -> anyhow::Result<()> {
                     (KeyModifiers::CONTROL, KeyCode::Char('q')) => {
                         break;
                     }
-                    _ => (),
+                    _ => {
+                        editor.input(key, &editor_area)?;
+                    }
                 };
             }
-
-            editor.input(key, &editor_area)?;
         }
     }
 

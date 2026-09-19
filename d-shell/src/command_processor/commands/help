@@ -1,5 +1,9 @@
-Welcome to DShell Version 0.2
+Welcome to DShell Version 0.3
 
 Commands:
-  cd,
-  ls,
+  cat [file name],
+  cd [directory to cd into],
+  clear,
+  echo "[text]",
+  edit [file name],
+  exit,
