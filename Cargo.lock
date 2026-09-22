@@ -785,7 +785,7 @@ dependencies = [
 
 [[package]]
 name = "d-shell"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "clearscreen",
  "comfy-table",
@@ -801,7 +801,7 @@ dependencies = [
 
 [[package]]
 name = "d-shell-bin"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "d-shell",
 ]

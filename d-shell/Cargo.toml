@@ -1,6 +1,6 @@
 [package]
 name = "d-shell"
-version = "0.01-26.09 ALPHA"
+version = "0.0.1"
 edition = "2024"
 
 [dependencies]
