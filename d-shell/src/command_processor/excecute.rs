@@ -5,32 +5,13 @@ use crate::{
 };
 
 impl ShellState {
-    pub fn run(&mut self, command: Vec<Token>) {
-        let mut command_to_run: Option<Box<dyn ShellCommand>> = None;
-        let mut input: String = String::new();
-        let mut arguments: Vec<Argument> = Vec::new();
-
-        for token in command {
-            match token {
-                Token::Command(cmd) => command_to_run = Some(cmd),
-                Token::Input(input_recieved) => input = input_recieved,
-                Token::Argument(argument) => arguments.push(argument),
-                Token::Pipe => {
-                    if let Some(cmd) = command_to_run.take() {
-                        self.execute(
-                            cmd,
-                            std::mem::take(&mut input),
-                            std::mem::take(&mut arguments),
-                        );
-                    }
-                    arguments.clear()
-                }
-            }
-        }
-
-        // Execute the final command if there was no Pipe
-        if let Some(cmd) = command_to_run {
-            self.execute(cmd, input, arguments);
+    pub fn run(&mut self, commands: Vec<Token>) {
+        for command in commands {
+            let input = match command.input {
+                Some(input) => input,
+                None => String::new(),
+            };
+            self.execute(command.command, input, command.arguments);
         }
     }
 
@@ -46,6 +27,11 @@ impl ShellState {
             self.output.clone()
         };
         let output = command.run(self, input, arguments);
-        self.output = output;
+        match output {
+            Ok(command_results) => self.output = command_results,
+            Err(err_msg) => {
+                eprintln!("{}", err_msg)
+            }
+        }
     }
 }

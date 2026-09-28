@@ -1,3 +1,5 @@
+#![feature(titlecase)]
+
 pub mod command_processor;
 pub mod input;
 pub mod script_parsing;

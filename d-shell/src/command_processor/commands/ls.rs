@@ -7,7 +7,11 @@ use comfy_table::{
     Cell, Color, Table, modifiers::UTF8_ROUND_CORNERS, presets::UTF8_FULL_CONDENSED,
 };
 
-use crate::{command_processor::commands::ShellCommand, state::ShellState, token_types::Argument};
+use crate::{
+    command_processor::commands::{CommandError, ShellCommand},
+    state::ShellState,
+    token_types::Argument,
+};
 
 pub struct LS {
     elements: Vec<File>,
@@ -36,7 +40,12 @@ impl ShellCommand for LS {
         }
     }
 
-    fn run(&mut self, state: &mut crate::state::ShellState, _: String, _: Vec<Argument>) -> String {
+    fn run(
+        &mut self,
+        state: &mut crate::state::ShellState,
+        _: String,
+        _: Vec<Argument>,
+    ) -> Result<String, CommandError> {
         let mut table = Table::new();
         self.get_files(state);
         table
@@ -78,7 +87,7 @@ impl ShellCommand for LS {
             } else {
                 table.add_row(vec![
                     Cell::new(format!("{}", file.name)).fg(Color::Blue),
-                    Cell::new(format!("{}", size)).fg(Color::Blue),
+                    Cell::new("-".to_string()).fg(Color::Blue),
                     Cell::new("Folder").fg(Color::Blue),
                     Cell::new(format!(
                         "{}",
@@ -92,16 +101,23 @@ impl ShellCommand for LS {
             column.set_padding((0, 1)); // Removes left and right padding spaces
         }
         println!("{}", table);
-        String::new()
+        Ok(table.to_string())
+    }
+
+    fn validate_arguments(&self, _: Option<String>, _: Vec<Argument>) -> bool {
+        true
     }
 }
 
 impl LS {
-    fn get_files(&mut self, state: &mut ShellState) {
+    fn get_files(&mut self, state: &mut ShellState) -> Result<(), CommandError> {
         let files_iterator = match std::fs::read_dir(state.current_directory.clone()) {
             Ok(value) => value,
             Err(_) => {
-                return;
+                return Err(CommandError::generate_error(
+                    "ls",
+                    "Unable to read the directory",
+                ));
             }
         };
         for file in files_iterator {
@@ -134,30 +150,33 @@ impl LS {
                     });
                 }
                 Err(_) => {
-                    eprintln!(
-                        "This file or operating system is corrupted in some way... Unable to list files"
-                    );
+                    return Err(CommandError::generate_error(
+                        "ls",
+                        "This directory or operating system is corrupted in some way... Unable to list files",
+                    ));
                 }
             }
         }
+        Ok(())
     }
 }
+
 fn generate_time(seconds: Duration) -> String {
     let mut output = String::new();
     if seconds.as_secs() >= 31556952 {
-        output.push_str(&format!("{} Years   ", seconds.as_secs() / 31556952));
+        output.push_str(&format!("{} Year(s)   ", seconds.as_secs() / 31556952));
     } else if seconds.as_secs() >= 2629800 {
-        output.push_str(&format!("{} Months   ", seconds.as_secs() / 2629800));
+        output.push_str(&format!("{} Month(s)   ", seconds.as_secs() / 2629800));
     } else if seconds.as_secs() >= 604800 {
-        output.push_str(&format!("{} Weeks   ", seconds.as_secs() / 604800));
+        output.push_str(&format!("{} Week(s)   ", seconds.as_secs() / 604800));
     } else if seconds.as_secs() >= 86400 {
-        output.push_str(&format!("{} Days   ", seconds.as_secs() / 86400));
+        output.push_str(&format!("{} Day(s)   ", seconds.as_secs() / 86400));
     } else if seconds.as_secs() >= 3600 {
-        output.push_str(&format!("{} Hours   ", seconds.as_secs() / 3600));
+        output.push_str(&format!("{} Hour(s)   ", seconds.as_secs() / 3600));
     } else if seconds.as_secs() >= 60 {
-        output.push_str(&format!("{} Minutes   ", seconds.as_secs() / 60));
+        output.push_str(&format!("{} Minute(s)   ", seconds.as_secs() / 60));
     } else {
-        output.push_str(&format!("{} Seconds   ", seconds.as_secs()));
+        output.push_str(&format!("{} Second(s)   ", seconds.as_secs()));
     }
     output
 }

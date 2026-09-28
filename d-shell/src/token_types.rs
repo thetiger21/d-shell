@@ -1,20 +1,12 @@
 use crate::command_processor::commands::ShellCommand;
 
-pub enum Token {
-    Command(Box<dyn ShellCommand>),
-    Argument(Argument),
-    Input(String),
-    Pipe,
+pub struct Token {
+    pub command: Box<dyn ShellCommand>,
+    pub input: Option<String>,
+    pub arguments: Vec<Argument>,
 }
 
 pub struct Argument {
     pub id: String,
-    pub content: ArgumentType,
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum ArgumentType {
-    Single(String),
-    Multiple(Vec<String>),
-    Nothing,
+    pub content: Vec<String>,
 }

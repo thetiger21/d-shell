@@ -35,7 +35,9 @@ pub fn get_input(state: &mut ShellState, mut wasm_runtime: WasmRuntime) -> io::R
 
     let mut command_invalid = false;
 
-    print!("Please read usage policy before use by typing 'help -usage_policy'\n");
+    println!(
+        "D-Shell Copyright (C) 2026 TheTigre\r\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `help -usage_policy'\r\nThis is free software, and you are welcome to redistribute it under certain conditions; type `help -show_c' for details.\r\n\r\nWelcome to DShell Version 0.02-26.10 ALPHA\r\nYou can enter the command 'help' to display the valid commands\r\nPlease read usage policy before use by typing 'help -usage_policy'"
+    );
     state.display(&command, command_invalid, &stdout);
 
     stdout.flush()?;
@@ -76,8 +78,12 @@ pub fn get_input(state: &mut ShellState, mut wasm_runtime: WasmRuntime) -> io::R
                     command.insert(state.write_index, character);
                     state.write_index += 1;
                     match parse(&command) {
-                        Ok(_) => {
-                            command_invalid = false;
+                        Ok(commands) => {
+                            for command in commands {
+                                command_invalid = !command
+                                    .command
+                                    .validate_arguments(command.input, command.arguments);
+                            }
                         }
                         Err(_) => {
                             command_invalid = true;
@@ -99,8 +105,12 @@ pub fn get_input(state: &mut ShellState, mut wasm_runtime: WasmRuntime) -> io::R
                         command.remove(state.write_index - 1);
                         state.write_index -= 1;
                         match parse(&command) {
-                            Ok(_) => {
-                                command_invalid = false;
+                            Ok(commands) => {
+                                for command in commands {
+                                    command_invalid = !command
+                                        .command
+                                        .validate_arguments(command.input, command.arguments);
+                                }
                             }
                             Err(_) => {
                                 command_invalid = true;

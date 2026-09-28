@@ -1,0 +1,17 @@
+D-Shell Help
+
+Commands:
+  cat <file name>,
+    Displays the contents of a text file
+  cd <directory to cd into>,
+    Changes the current working directory of the shell
+  clear,
+    Clears the screen,
+  echo "[text]",
+    Outputs the text in the input
+  edit [file name],
+    A built in text editor to edit your text files
+  exit,
+    Exits the shell
+
+Usage policy not implemented yet.

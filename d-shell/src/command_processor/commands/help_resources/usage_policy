@@ -1,0 +1,33 @@
+======================================================================
+                            TERMS OF USAGE
+======================================================================
+DShell - an interactive all in one shell system build in Rust
+Copyright (C) 2026 Eren Nida Kasli
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You can view the GNU General Public License version 3 at
+https://spdx.org/licenses/GPL-3.0.html.
+
+The developer does however provide a handful of guidelines that we
+recommend following, in order to avoid violating the laws of your
+territory, or the rules of your school or workplace.
+
+DO NOT:
+  1. Use DShell to download, process or create content which may be
+  pornographic, violent or otherwise against your school or workplace
+  guidelines.
+
+  2. Use DShell to develop malware intended to be spread to cause
+  harm in any way possible
+
+  3. Use DShell to illegally hack into the computing systems of your
+  school or workplace or any other computer system.

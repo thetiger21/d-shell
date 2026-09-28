@@ -1,7 +1,11 @@
 use inline_colorization::*;
 use std::{fs, path::Path};
 
-use crate::{command_processor::commands::ShellCommand, state::ShellState, token_types::Argument};
+use crate::{
+    command_processor::commands::{CommandError, ShellCommand},
+    state::ShellState,
+    token_types::Argument,
+};
 
 pub struct CD;
 
@@ -15,7 +19,8 @@ impl ShellCommand for CD {
         state: &mut ShellState,
         mut input: String,
         arguments: Vec<Argument>,
-    ) -> String {
+    ) -> Result<String, CommandError> {
+        let command_name = "cd";
         #[cfg(target_family = "unix")]
         {
             if input.chars().nth(0) == Some('/') {
@@ -24,10 +29,10 @@ impl ShellCommand for CD {
                         state.current_directory = input.clone();
                     }
                     Err(_) => {
-                        eprintln!("Directory does not exist");
-                        return format!(
-                            "{color_red}{style_bold}CD: Directory does not exist{style_reset}"
-                        );
+                        return Err(CommandError::generate_error(
+                            command_name,
+                            "Directory does not exist",
+                        ));
                     }
                 }
             } else if input.chars().nth(0) == Some('.') && input.chars().nth(1) == Some('.') {
@@ -39,12 +44,18 @@ impl ShellCommand for CD {
                     }
                 } else if in_root {
                     self.run(state, input, arguments);
-                    return "In root directory".to_string();
+                    return Err(CommandError::generate_error(
+                        command_name,
+                        "In root directory - cannot go back any further",
+                    ));
                 } else {
                     state.current_directory.push('/');
-                    return "In root directory".to_string();
+                    return Err(CommandError::generate_error(
+                        command_name,
+                        "In root directory - cannot go back any further",
+                    ));
                 }
-                return "Successfully changed directory".to_string();
+                return Ok("Successfully changed directory".to_string());
             } else {
                 let string_path = format!("{}/{}", state.current_directory, input);
                 let path = Path::new(&string_path);
@@ -55,10 +66,10 @@ impl ShellCommand for CD {
                         state.current_directory.push_str(&mut input);
                     }
                     Err(_) => {
-                        eprintln!("Cd: Directory doesnt exist");
-                        return format!(
-                            "{color_red}{style_bold}CD: Directory does not exist{style_reset}"
-                        );
+                        return Err(CommandError::generate_error(
+                            command_name,
+                            "Directory does not exist",
+                        ));
                     }
                 }
             }
@@ -72,9 +83,10 @@ impl ShellCommand for CD {
                     }
                     Err(_) => {
                         eprintln!("Directory does not exist");
-                        return format!(
-                            "{color_red}{style_bold}CD: Directory does not exist{style_reset}"
-                        );
+                        return Err(CommandError::generate_error(
+                            command_name,
+                            "Directory does not exist",
+                        ));
                     }
                 }
             } else if input.chars().nth(0) == Some('.') && input.chars().nth(1) == Some('.') {
@@ -86,12 +98,18 @@ impl ShellCommand for CD {
                     }
                 } else if in_root {
                     self.run(state, input, arguments);
-                    return "In root directory".to_string();
+                    return Err(CommandError::generate_error(
+                        command_name,
+                        "In root directory - cannot go back any further",
+                    ));
                 } else {
                     state.current_directory.push('\\');
-                    return "In root directory".to_string();
+                    return Err(CommandError::generate_error(
+                        command_name,
+                        "In root directory - cannot go back any further",
+                    ));
                 }
-                return "Successfully changed directory".to_string();
+                return Ok("Successfully changed directory".to_string());
             } else {
                 let string_path = format!("{}/{}", state.current_directory, input);
                 let path = Path::new(&string_path);
@@ -101,14 +119,18 @@ impl ShellCommand for CD {
                         state.current_directory.push_str(&mut input);
                     }
                     Err(_) => {
-                        eprintln!("Cd: Directory doesnt exist");
-                        return format!(
-                            "{color_red}{style_bold}CD: Directory does not exist{style_reset}"
-                        );
+                        return Err(CommandError::generate_error(
+                            command_name,
+                            "Directory does not exist",
+                        ));
                     }
                 }
             }
         }
-        "Successfully changed directory".to_string()
+        Ok("Successfully changed directory".to_string())
+    }
+
+    fn validate_arguments(&self, input: Option<String>, _: Vec<Argument>) -> bool {
+        input.is_some_and(|path| fs::exists(&path).unwrap_or(false))
     }
 }

@@ -13,15 +13,14 @@ use ratatui_code_editor::editor::Editor;
 use ratatui_code_editor::theme::vesper;
 use std::{fs, io::stdout};
 
-pub fn run_editor(file_path: &str) -> anyhow::Result<()> {
+pub fn run_editor(programming_language: &str, text: &str, file_path: &str) -> anyhow::Result<()> {
     enable_raw_mode()?;
     execute!(stdout(), EnterAlternateScreen)?;
 
     let backend = CrosstermBackend::new(stdout());
     let mut terminal = Terminal::new(backend)?;
 
-    let content = fs::read_to_string(file_path)?;
-    let mut editor = Editor::new("rust", &content, vesper())?;
+    let mut editor = Editor::new(programming_language, &text, vesper())?;
     let mut editor_area = Rect::default();
 
     loop {

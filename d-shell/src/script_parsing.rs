@@ -1,5 +1,8 @@
 use crate::{
-    command_processor::parse::{lexer::lexer, parser::parser},
+    command_processor::parse::{
+        lexer::lexer,
+        parser::parser::{self, parser},
+    },
     state::ShellState,
 };
 
